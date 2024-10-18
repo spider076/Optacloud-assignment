@@ -51,7 +51,7 @@ const LocationModal = () => {
 
   return (
     <main className="w-full h-full">
-      {location && (
+      {!location && (
         <div className="fixed bg-black top-0 left-0 z-50 w-full h-full flex items-center justify-center bg-gray-80 bg-opacity-90">
           <div className="bg-white flex flex-col items-center space-y-4 rounded-md py-4 max-w-sm w-[30%]">
             <div className="px-5">
