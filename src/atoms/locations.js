@@ -4,3 +4,18 @@ export const autoLocState = atom({
   key: "autoLocState",
   default: false
 });
+
+export const triggerLocationState = atom({
+  key: "triggerLocationState",
+  default: false
+});
+
+export const addressState = atom({
+  key: "addressState",
+  default: null
+});
+
+export const addressFormVisibleState = atom({
+  key: 'addressFormVisibleState',
+  default: false, // Initially hidden
+});

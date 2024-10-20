@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
-import { useSetRecoilState } from "recoil";
-import { autoLocState } from "../atoms/locations";
+import { useRecoilState, useSetRecoilState } from "recoil";
+import { autoLocState, triggerLocationState } from "../atoms/locations";
 import { Search } from "lucide-react";
 
 const LocationModal = () => {
   const [location, setLocation] = useState(null);
+  const [triggerLocation, setTriggerLocation] =
+    useRecoilState(triggerLocationState);
   const [userLocation, setUserLocation] = useState(null);
   const setAutoLocState = useSetRecoilState(autoLocState);
 
@@ -14,11 +16,13 @@ const LocationModal = () => {
     // Check if the user has granted location permission
     if ("geolocation" in navigator) {
       navigator.permissions.query({ name: "geolocation" }).then((result) => {
+        setTriggerLocation(true);
         console.log("result : ", result);
 
         if (result.state === "denied") {
           setLocation(false); // Permission is denied
         } else if (result.state === "granted") {
+          setTriggerLocation(false);
           setLocation(true);
           setAutoLocState(true);
         }
@@ -49,9 +53,11 @@ const LocationModal = () => {
     }
   };
 
+  console.log("trigger locatin : ", triggerLocation);
+
   return (
     <main className="w-full h-full">
-      {!location && (
+      {triggerLocation && (
         <div className="fixed bg-black top-0 left-0 z-50 w-full h-full flex items-center justify-center bg-gray-80 bg-opacity-90">
           <div className="bg-white flex flex-col items-center space-y-4 rounded-md py-4 max-w-sm w-[30%]">
             <div className="px-5">
@@ -80,7 +86,7 @@ const LocationModal = () => {
               <button
                 onClick={() => {
                   setAutoLocState(false);
-                  setLocation();
+                  setTriggerLocation(false);
                 }}
                 className="border-gray-200 mt-3 border-y w-full hover:text-black text-[#D8002E] font-semibold py-2 px-4 inline-flex justify-center items-center text-sm rounded"
               >

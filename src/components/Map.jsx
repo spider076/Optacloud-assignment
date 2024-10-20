@@ -1,110 +1,128 @@
-import React, { useState, useCallback } from "react";
-import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
-import { useGeolocated } from "react-geolocated";
+import "mapbox-gl/dist/mapbox-gl.css";
+import * as React from "react";
+import { useCallback, useEffect, useState } from "react";
 
-const containerStyle = {
-  width: "100%",
-  height: "400px"
-};
+import ReactMapGL, { Marker } from "react-map-gl";
+import Pin from "./pin";
+import { useRecoilState, useSetRecoilState } from "recoil";
+import { addressState, autoLocState } from "../atoms/locations";
+import { LocateFixed } from "lucide-react";
+import ControlPanel from "./ControlPanel";
+// import "maplibre-gl/dist/maplibre-gl.css";
 
-const center = {
-  lat: 40.7128, // Default location (New York City)
-  lng: -74.006
-};
-
-const libraries = ["places"]; // For address autocomplete
-
-function MapWithPinSelection() {
-  const [mapCenter, setMapCenter] = useState(center);
-  const [markerPosition, setMarkerPosition] = useState(center);
-  const [address, setAddress] = useState("");
-
-  const { coords } = useGeolocated({
-    positionOptions: {
-      enableHighAccuracy: true
-    },
-    userDecisionTimeout: 5000
+// Replace with your Mapbox Access Token
+const TOKEN = import.meta.env.VITE_ACCESS_TOKEN;
+export default function MapWithPinSelection() {
+  const [marker, setMarker] = useState({
+    longitude: 77.5855,
+    latitude: 12.9634,
+    zoom: 15
   });
+  const [address, setAddress] = useState("Unknown Location");
+  const [autoLocation, setAutoLocation] = useRecoilState(autoLocState);
+  const setLocAddress = useSetRecoilState(addressState);
 
-  const onLoad = useCallback(
-    (map) => {
-      if (coords) {
-        const newCenter = {
-          lat: coords.latitude,
-          lng: coords.longitude
-        };
-        setMapCenter(newCenter);
-        setMarkerPosition(newCenter);
-        map.panTo(newCenter);
-      }
+  // Handler to fetch address based on longitude and latitude
+  const fetchAddress = useCallback((lng, lat) => {
+    fetch(
+      `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?types=address&access_token=${TOKEN}`
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        const placeName = data.features[0]?.place_name || "Unknown Location";
+        setAddress(placeName); // Update address
+        setLocAddress(placeName);
+      })
+      .catch((err) => {
+        console.error("Geocoding error:", err);
+        setAddress("Error retrieving address");
+      });
+  }, []);
+
+  // Handler when clicking on the map
+  const handleMapClick = useCallback(
+    (event) => {
+      console.log("from onCLick : ", event);
+
+      const { lng, lat } = event.lngLat;
+      setMarker({ longitude: lng, latitude: lat });
+      fetchAddress(lng, lat); // Fetch and display address on click
     },
-    [coords]
+    [fetchAddress]
   );
 
-  const handleMarkerDrag = (event) => {
-    const newPosition = {
-      lat: event.latLng.lat(),
-      lng: event.latLng.lng()
-    };
-    setMarkerPosition(newPosition);
-    // Optionally, reverse geocode to get address from lat/lng
-  };
+  const onMarkerDrag = useCallback((event) => {
+    const { lng, lat } = event.lngLat;
+    setMarker({ longitude: lng, latitude: lat });
+  }, []);
 
-  const handleSearchLocation = (place) => {
-    const newLocation = {
-      lat: place.geometry.location.lat(),
-      lng: place.geometry.location.lng()
-    };
-    setMapCenter(newLocation);
-    setMarkerPosition(newLocation);
-  };
+  const onMarkerDragEnd = useCallback(
+    (event) => {
+      const { lng, lat } = event.lngLat;
+      setMarker({ longitude: lng, latitude: lat });
+      fetchAddress(lng, lat); // Fetch and display address for current location
 
+      fetchAddress(lng, lat); // Fetch and display address when pin is dragged
+    },
+    [fetchAddress]
+  );
+
+  // Function to locate user's current location using browser geolocation
   const locateMe = () => {
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          const newCenter = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-          };
-          setMapCenter(newCenter);
-          setMarkerPosition(newCenter);
+          const { latitude, longitude } = position.coords;
+          setMarker({ latitude, longitude });
+          fetchAddress(longitude, latitude); // Fetch and display address for current location
         },
         (error) => {
-          alert("Error getting location: " + error.message);
+          console.error("Geolocation error:", error);
         }
       );
+    } else {
+      alert("Geolocation is not supported by your browser");
     }
   };
 
+  useEffect(() => {
+    // locateMe();
+    fetchAddress(marker.longitude, marker.latitude);
+  }, []);
+
   return (
-    <div>
-      {/* Map Component */}
-      <LoadScript
-        googleMapsApiKey={import.meta.env.VITE_GOOGLE_API}
-        libraries={libraries}
+    <main className="h-[500px] flex flex-col space-y-4">
+      <ReactMapGL
+        {...marker}
+        mapboxAccessToken={import.meta.env.VITE_ACCESS_TOKEN}
+        width="600px"
+        height="500px"
+        onDblClick={handleMapClick} // Click event handler
+        transitionDuration="200"
+        mapStyle="mapbox://styles/mapbox/streets-v11"
+        onViewportChange={(viewport) => setMarker(viewport)}
       >
-        <GoogleMap
-          mapContainerStyle={containerStyle}
-          center={mapCenter}
-          zoom={14}
-          onLoad={onLoad}
+        <Marker
+          longitude={marker.longitude}
+          latitude={marker.latitude}
+          anchor="bottom"
+          {...(autoLocation && "draggable")}
+          offset={[0, 0]}
+          onDrag={onMarkerDrag}
+          onDragEnd={onMarkerDragEnd}
         >
-          {/* Marker for pin location */}
-          <Marker
-            position={markerPosition}
-            draggable={true}
-            onDragEnd={handleMarkerDrag}
-          />
-        </GoogleMap>
-      </LoadScript>
+          {!autoLocation ? (
+            <LocateFixed
+              size={25}
+              className="animate-ping text-blue-800 transition-colors ease-in-out duration-150"
+            />
+          ) : (
+            <Pin size={30} />
+          )}
+        </Marker>
+      </ReactMapGL>
 
-      {/* Locate Me Button */}
-      <button onClick={locateMe}>Locate Me</button>
-
-      {/* Add more UI for address search and manual location entry */}
-    </div>
+      <ControlPanel locateMe={locateMe} address={address} />
+    </main>
   );
 }
-
-export default MapWithPinSelection;
