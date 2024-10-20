@@ -1,5 +1,5 @@
 import { MapPin, Save } from "lucide-react";
-import React from "react";
+import React, { useState } from "react";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import {
   addressFormVisibleState,
@@ -13,7 +13,7 @@ const ControlPanel = ({ locateMe, address }) => {
   const [saveVisible, setSaveVisible] = useRecoilState(addressFormVisibleState);
 
   return (
-    <main className="flex justify-between bg-white text-black items-center p-4 rounded-md">
+    <main className="flex max-sm:flex-col justify-between bg-white text-black items-center p-4 mb-6 rounded-md">
       <div className="flex flex-col space-y-4 text-left">
         <p className="text-red-500">Save Your Address Now</p>
 
@@ -22,7 +22,7 @@ const ControlPanel = ({ locateMe, address }) => {
           {address}
         </h1>
       </div>
-      <div className="flex flex-col space-y-4">
+      <div className="flex flex-col max-sm:space-x-4 max-sm:mt-5 md:space-y-4 max-sm:flex-row">
         <button
           className="text-white bg-red-700 hover:bg-white hover:text-red-600 px-2 py-1 rounded-md flex items-center"
           onClick={() => {

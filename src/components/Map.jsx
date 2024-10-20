@@ -20,24 +20,27 @@ export default function MapWithPinSelection() {
   });
   const [address, setAddress] = useState("Unknown Location");
   const [autoLocation, setAutoLocation] = useRecoilState(autoLocState);
-  const setLocAddress = useSetRecoilState(addressState);
+  const [locAddress, setLocAddress] = useRecoilState(addressState);
 
   // Handler to fetch address based on longitude and latitude
-  const fetchAddress = useCallback((lng, lat) => {
-    fetch(
-      `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?types=address&access_token=${TOKEN}`
-    )
-      .then((response) => response.json())
-      .then((data) => {
-        const placeName = data.features[0]?.place_name || "Unknown Location";
-        setAddress(placeName); // Update address
-        setLocAddress(placeName);
-      })
-      .catch((err) => {
-        console.error("Geocoding error:", err);
-        setAddress("Error retrieving address");
-      });
-  }, []);
+  const fetchAddress = useCallback(
+    (lng, lat) => {
+      fetch(
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?types=address&access_token=${TOKEN}`
+      )
+        .then((response) => response.json())
+        .then((data) => {
+          const placeName = data.features[0]?.place_name || "Unknown Location";
+          setAddress(placeName); // Update address
+          setLocAddress(placeName);
+        })
+        .catch((err) => {
+          console.error("Geocoding error:", err);
+          setAddress("Error retrieving address");
+        });
+    },
+    [locAddress]
+  );
 
   // Handler when clicking on the map
   const handleMapClick = useCallback(
@@ -60,9 +63,9 @@ export default function MapWithPinSelection() {
     (event) => {
       const { lng, lat } = event.lngLat;
       setMarker({ longitude: lng, latitude: lat });
-      fetchAddress(lng, lat); // Fetch and display address for current location
+      fetchAddress(lng, lat);
 
-      fetchAddress(lng, lat); // Fetch and display address when pin is dragged
+      fetchAddress(lng, lat);
     },
     [fetchAddress]
   );
@@ -74,7 +77,7 @@ export default function MapWithPinSelection() {
         (position) => {
           const { latitude, longitude } = position.coords;
           setMarker({ latitude, longitude });
-          fetchAddress(longitude, latitude); // Fetch and display address for current location
+          fetchAddress(longitude, latitude);
         },
         (error) => {
           console.error("Geolocation error:", error);
@@ -91,7 +94,7 @@ export default function MapWithPinSelection() {
   }, []);
 
   return (
-    <main className="h-[500px] flex flex-col space-y-4">
+    <main className="h-[800px] flex flex-col space-y-4">
       <ReactMapGL
         {...marker}
         mapboxAccessToken={import.meta.env.VITE_ACCESS_TOKEN}

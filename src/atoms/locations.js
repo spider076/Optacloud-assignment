@@ -16,6 +16,11 @@ export const addressState = atom({
 });
 
 export const addressFormVisibleState = atom({
-  key: 'addressFormVisibleState',
-  default: false, // Initially hidden
+  key: "addressFormVisibleState",
+  default: false // Initially hidden
+});
+
+export const authTokenState = atom({
+  key: "authTokenState",
+  default: null // Initially no token
 });

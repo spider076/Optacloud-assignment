@@ -41,6 +41,8 @@ const LocationModal = () => {
             lng: position.coords.longitude
           });
           setLocation(true);
+
+          setTriggerLocation(false);
         },
         (error) => {
           if (error.code === error.PERMISSION_DENIED) {
