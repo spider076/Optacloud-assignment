@@ -41,7 +41,7 @@ const LocationModal = () => {
             lng: position.coords.longitude
           });
           setLocation(true);
-
+          setAutoLocState(true);
           setTriggerLocation(false);
         },
         (error) => {
@@ -61,7 +61,7 @@ const LocationModal = () => {
     <main className="w-full h-full">
       {triggerLocation && (
         <div className="fixed bg-black top-0 left-0 z-50 w-full h-full flex items-center justify-center bg-gray-80 bg-opacity-90">
-          <div className="bg-white flex flex-col items-center space-y-4 rounded-md py-4 max-w-sm w-[30%]">
+          <div className="bg-white flex flex-col items-center space-y-4 rounded-md py-4 max-w-sm lg:w-[30%]">
             <div className="px-5">
               <h2 className="border-b pb-4 text-xl text-red-600 font-bold ">
                 Location Permission Needed

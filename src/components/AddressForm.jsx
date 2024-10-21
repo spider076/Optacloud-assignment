@@ -21,7 +21,7 @@ const AddressForm = () => {
     houseNo: "",
     roadArea: "",
     category: "",
-    address: savedAddress ? savedAddress : ""
+    address: savedAddress && savedAddress
   });
 
   const handleInputChange = (e) => {
@@ -42,8 +42,12 @@ const AddressForm = () => {
       addressDetails.roadArea === ""
     ) {
       toast.error("Please fill in all fields.");
+      console.log(addressDetails);
+
       return;
     }
+
+    console.log(addressDetails);
 
     setLoading(true);
 
@@ -59,7 +63,7 @@ const AddressForm = () => {
         houseNo: addressDetails?.houseNo,
         apartment: addressDetails?.roadArea,
         category: addressDetails?.category,
-        fullAddress: addressDetails?.address
+        fullAddress: savedAddress
       };
 
       const response = await axios.post(

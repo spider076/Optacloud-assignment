@@ -39,7 +39,7 @@ export default function MapWithPinSelection() {
           setAddress("Error retrieving address");
         });
     },
-    [locAddress]
+    [locAddress, address]
   );
 
   // Handler when clicking on the map
@@ -57,6 +57,7 @@ export default function MapWithPinSelection() {
   const onMarkerDrag = useCallback((event) => {
     const { lng, lat } = event.lngLat;
     setMarker({ longitude: lng, latitude: lat });
+    fetchAddress(lng, lat);
   }, []);
 
   const onMarkerDragEnd = useCallback(
@@ -100,28 +101,30 @@ export default function MapWithPinSelection() {
         mapboxAccessToken={import.meta.env.VITE_ACCESS_TOKEN}
         width="600px"
         height="500px"
+        doubleClickZoom={false}
         onDblClick={handleMapClick} // Click event handler
         transitionDuration="200"
         mapStyle="mapbox://styles/mapbox/streets-v11"
+        dragRotate={true}
         onViewportChange={(viewport) => setMarker(viewport)}
       >
         <Marker
           longitude={marker.longitude}
           latitude={marker.latitude}
           anchor="bottom"
-          {...(autoLocation && "draggable")}
-          offset={[0, 0]}
+          draggable
+          // offset={[0, 0]}
           onDrag={onMarkerDrag}
           onDragEnd={onMarkerDragEnd}
         >
-          {!autoLocation ? (
+          {/* {!autoLocation ? (
             <LocateFixed
               size={25}
               className="animate-ping text-blue-800 transition-colors ease-in-out duration-150"
             />
-          ) : (
-            <Pin size={30} />
-          )}
+          ) : ( */}
+          <Pin size={30} />
+          {/* )} */}
         </Marker>
       </ReactMapGL>
 

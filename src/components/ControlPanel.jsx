@@ -27,9 +27,9 @@ const ControlPanel = ({ locateMe, address }) => {
           className="text-white bg-red-700 hover:bg-white hover:text-red-600 px-2 py-1 rounded-md flex items-center"
           onClick={() => {
             locateMe();
-            {
-              !autoLoc && setTriggerLocation(true);
-            }
+            // {
+            //   !autoLoc && setTriggerLocation(true);
+            // }
           }}
         >
           <MapPin className="text-white mr-2" size={15} /> Locate Me

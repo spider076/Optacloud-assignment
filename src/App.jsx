@@ -49,7 +49,7 @@ function App() {
       {/* footer */}
       <footer className="flex bg-[#242424] z-10 fixed bottom-0 w-full space-x-4 border-t justify-center py-4">
         <a
-          href="https://github.com/syamkumar-dev"
+          href="https://github.com/spider076/Optacloud-assignment.git"
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -71,7 +71,7 @@ function App() {
           </svg>
         </a>
         <a
-          href="https://www.linkedin.com/in/syam-kumar-dev-6b6b8a1b9/"
+          href="https://www.linkedin.com/in/mohammed-saad-9774b2253/"
           target="_blank"
           rel="noopener noreferrer"
         >
