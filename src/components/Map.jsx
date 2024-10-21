@@ -57,7 +57,7 @@ export default function MapWithPinSelection() {
   const onMarkerDrag = useCallback((event) => {
     const { lng, lat } = event.lngLat;
     setMarker({ longitude: lng, latitude: lat });
-    fetchAddress(lng, lat);
+    // fetchAddress(lng, lat);
   }, []);
 
   const onMarkerDragEnd = useCallback(

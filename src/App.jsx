@@ -46,6 +46,7 @@ function App() {
         />
         <Route path="/addresses" element={<AddressList />} />
       </Routes>
+      
       {/* footer */}
       <footer className="flex bg-[#242424] z-10 fixed bottom-0 w-full space-x-4 border-t justify-center py-4">
         <a
